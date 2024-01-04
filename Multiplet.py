@@ -1,39 +1,40 @@
-import numpy as np
 import re
 
-pi = 3.141592653589793238462643383279502884
+import numpy as np
+
+pi = np.pi
 m = 9.1093897e-28
 c = 2.99792458e10
 h = 6.6260755e-27
 qe = 4.8032068e-10
 
 
-class line:
+class Line:
     def __init__(self, f, wn, u2, u4, u6):
-        self.f = np.longdouble(f)
-        self.wn = np.longdouble(wn)
-        self.u2 = np.longdouble(u2)
-        self.u4 = np.longdouble(u4)
-        self.u6 = np.longdouble(u6)
+        self.f = float(f)
+        self.wn = float(wn)
+        self.u2 = float(u2)
+        self.u4 = float(u4)
+        self.u6 = float(u6)
 
-    def __repr__(self):
+    def __str__(self):
         return (
             f"{self.f:.5} {int(self.wn): 5d} {self.u2:.4} {self.u4:.4} {self.u6:.4}\n"
         )
 
 
-class emline:
+class EmLine:
     def __init__(self, wn, u2, u4, u6):
         self.wn = np.longdouble(wn)
         self.u2 = np.longdouble(u2)
         self.u4 = np.longdouble(u4)
         self.u6 = np.longdouble(u6)
 
-    def __repr__(self):
+    def __str__(self):
         return f"{int(self.wn): 5d} {self.u2:.4} {self.u4:.4} {self.u6:.4}\n"
 
 
-def F(line, n, tjpo, o2, o4, o6):
+def oscillator_strength(line, n, tjpo, o2, o4, o6):
     #   print(type(n))
     # print(f"{line} n=  {n} {tjpo} {o2} {o4} {o6}")
     wl = 1 / line.wn
@@ -70,13 +71,14 @@ class Multiplet:
                 match.groupdict()["u4"],
                 match.groupdict()["u6"],
             )
-            self.add_line(line(f, wn, u2, u4, u6))
+            self.add_line(Line(f, wn, u2, u4, u6))
 
     def load_rate(self, fname):
         print("________________________________________")
         print(f"Loading emission data from {fname}")
         with open(fname) as f:
             lines = [line.strip("\n") for line in f]
+        twojplusone: int
         (twojplusone, n) = lines[0].split(" ")
         self.n = np.longdouble(n)
         self.tjpo = np.longdouble(twojplusone)
@@ -96,8 +98,8 @@ class Multiplet:
             if match.groupdict()["amd"] is not None:
                 self.amd = self.n**3 * np.longdouble(match.groupdict()["amd"])
                 # print(f'Magnetic dipole contribution to transition rate is {self.amd}')
-            self.add_emline(emline(wn, u2, u4, u6))
-            print (self)
+            self.add_emline(EmLine(wn, u2, u4, u6))
+        print(self)
 
     def calculate_rates(self, parameters):
         rates = []
@@ -118,25 +120,27 @@ class Multiplet:
         print("Wavenumber wavelength rate branching ratio %")
         for i in range(len(self.lines)):
             print(
-                f"{int(self.lines[i].wn)} {1e7/self.lines[i].wn:.1f} {rates[i]:.5} {100*rates[i]/sumrate:.4}"
+                f"{int(self.lines[i].wn)} {1e7 / self.lines[i].wn:.1f} {rates[i]:.5} {100 * rates[i] / sumrate:.4}"
             )
         print("________________________________________")
         print(
-            f"Total rate         {sumrate:.1f} s^-1 {1e6/sumrate:.0f} us  or {1e3/sumrate:.2f} ms"
+            f"Total rate         {sumrate:.1f} s^-1 {1e6 / sumrate:.0f} us  or {1e3 / sumrate:.2f} ms"
         )
-        if hasattr(self,"amd"):
+        if self.amd is not None:
             sumrate += self.amd
             print(
-                f"Total rate with MD {sumrate:.1f} s^-1 {1e6/sumrate:.0f} us  or {1e3/sumrate:.2f} ms"
+                f"Total rate with MD {sumrate:.1f} s^-1 {1e6 / sumrate:.0f} us  or {1e3 / sumrate:.2f} ms"
             )
-            print(f"Magnetic dipole contribution to transition rate is {self.amd}")
+            print(f"Magnetic dipole contribution to transition rate is {self.amd:.5}")
 
     def __init__(self):
+        self.amd = None
         self.lines = []
         self.n = 1.234
         self.tjpo = 2
+        self.is_fitted = False
 
-    def __repr__(self):
+    def __str__(self):
         strlines = ""
         for line in self.lines:
             strlines += str(line)
