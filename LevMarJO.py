@@ -11,7 +11,7 @@ def chi2(multiplet, params):
     return chi2_value
 
 
-def residue(line, n, tjpo, params):
+def residue(line, n, tjpo, params):   # tjpo for two j plus one or 2J+1
     return float(line.f) - oscillator_strength(
         line, n, tjpo, params[0], params[1], params[2]
     )
@@ -35,7 +35,6 @@ def calculate_matrices(multiplet, params):
                 )
                 / delta
             )
-    # print(f" Jakobian {Jaco} natomiast R {R}")
     hess = np.matmul(jacobian.T, jacobian)
     grad = np.matmul(jacobian.T, residue_vector)
     return hess, grad, residue_vector
@@ -49,14 +48,11 @@ def levenberg_marquardt_fit(dane):
     print("Step number o2 o4 o6 chi2")
     for j in range(10):
         (hess, grad, r) = calculate_matrices(dane, params)
-        # print (f"R= {R}")
         hessd = np.diag(
             np.diag(hess)
-        )  # Macierz ktora ma elementy hessianu na przekatnej a zere poza
+        )  # Matrix having same diagonal as Hessian, but zeroes everywhere else
         curr_chi2 = np.matmul(r.T, r)
-        # print(f"hesjan jego taka {Hess}, a conditional {cond(Hess)}")
         nparams = params - np.matmul(inv(hess + lam * hessd), grad)
-        # print(chi2(dane, nparams), currChi2)
         if chi2(dane, nparams) < curr_chi2:
             params = nparams
             lam = lam * 1.8
@@ -88,7 +84,7 @@ def levenberg_marquardt_fit(dane):
             line, dane.n, dane.tjpo, params[0], params[1], params[2]
         )
         print(
-            f"{int(line.wn)} {1e7/line.wn:.1f} {line.f:.5} {tf:.5} { 100*(line.f-tf)/line.f:.2f}%"
+            f"{int(line.wn)} {1e7/line.wn:.1f} {line.f:.5} {tf:.5} {100*(line.f-tf)/line.f:.2f}%"
         )
         sum_of_squares += (line.f - tf) ** 2
         sum_of_strengths += line.f
