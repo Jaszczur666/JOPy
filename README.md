@@ -11,12 +11,12 @@ Format of input file is as follows
     fexp_2 wavenumber_2 u2_2 u4_2 u6_2
     ...
     fexp_n wavenumber_n u2_n u4_n u6_n
-where 2J+1 is total angular moment of fundamental multiplet, n is index of refraction, $fexp_i$ is i-th experimental oscillator strength and $u{2i}$ $u_{4i}$ $u_{6i}$ are doubly reduced matrix elements of dipole transition, which can be found in literature.
+where 2J+1 is total angular momentum of fundamental multiplet, n is index of refraction, $fexp_i$ is i-th experimental oscillator strength and $u_{2i}$ $u_{4i}$ $u_{6i}$ are doubly reduced matrix elements of dipole transition, which can be found in literature.
 ## A bit of theory ##
 f<sub>exp</sub> can be calculated using formula $$f_{exp}=4.32*10^{-9} \frac{\int ABS(\nu) d\nu}{c d}$$ where ABS is absorbance, $\nu$ is wavenumber in cm<sup>-1</sup>, c is concentration of absorbing ions in mol/L and d is sample thickness in cm.
 On the other hand oscillator strength $f_{theor}$ can be calculated using formula
 $$f_{theor}= \frac{8 \pi^2 m c }{3 h  \lambda 2J+1} \frac{n(n^2+2)^2}{9} \Sigma_{t=2,4,6} \Omega_t |\langle l^N\Psi J ||U^{(t)} || l^N\Psi\prime J\prime \rangle $$
-This enables to fit experimental data by finding the set of $\Omega_t$ values that minimize RMS error. Having those parameters we can also predict the transition rates of all other possible transitions.
+This enables to fit experimental data by finding the set of $\Omega_t$ values that minimize RMS error. This software uses Levenberg-Marquardt algorithm to achieve this goal. It is a bit of overkill as this could be simply solved by solving a system of n algebraic equations, but adapting existing code for general case of LM algorithm proved to be pretty trivial. Having those parameters we can also predict the transition rates of all other possible transitions.
 
 ## Input file format for emission ##
 Format of those input files differs only a little, namely the column holding fexp is missing, as it is irrelevant in this context. 
@@ -28,5 +28,9 @@ File format for emission data is
     ...
     wavenumber_n u2_n u4_n u6_n
 
-The software will calculate radiative transition rates for all multiplets, and also calculate branching ratios and radiative lifetime.
-If there is comment with #amd=xx.xxx then additionally magnetic dipole contribution will be added and reported. This is now done on per-file basis, as this is most relevant to some laser transitions from the first excited level in which there is only single line, but generalising this to apply per line is rather easy and will be possibly done in the future.
+The software will calculate radiative transition rates for all multiplets in file, and also calculate branching ratios and radiative lifetime.
+These are calculated from equations 
+
+
+
+If there is comment with `#amd=xx.xxx` then additionally magnetic dipole contribution will be added and reported. This is now done on per-file basis, as this is most relevant to some laser transitions from the first excited level in which there is only single line, but generalising this to apply per line is rather easy and will be possibly done in the future.
