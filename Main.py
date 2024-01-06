@@ -29,8 +29,12 @@ while True:
         timestring = f"{now.year}{now.month}{now.day}{now.hour}{now.minute}{now.second}"
         dirpath = os.path.dirname(filename)
         (file, ext) = os.path.splitext(os.path.basename(filename))
-        with open(os.path.join(dirpath, "abso" + timestring + file + ".log"), "wt", encoding='UTF-8') as f:
-            f.write(window['ML'].get())
+        with open(
+            os.path.join(dirpath, "abso" + timestring + file + ".log"),
+            "wt",
+            encoding="UTF-8",
+        ) as f:
+            f.write(window["ML"].get())
     if event == "RATE":
         if x.is_fitted:
             filenames = sg.popup_get_file(
@@ -42,11 +46,17 @@ while True:
                 emi.load_rate(fname)
                 emi.calculate_rates(params)
             now = datetime.now()
-            timestring = f"{now.year}{now.month}{now.day}{now.hour}{now.minute}{now.second}"
+            timestring = (
+                f"{now.year}{now.month}{now.day}{now.hour}{now.minute}{now.second}"
+            )
             dirpath = os.path.dirname(filename)
             (file, ext) = os.path.splitext(os.path.basename(filename))
-            with open(os.path.join(dirpath, "emi" + timestring + file + ".log"), "wt", encoding='UTF-8') as f:
-                f.write(window['ML'].get())
+            with open(
+                os.path.join(dirpath, "emi" + timestring + file + ".log"),
+                "wt",
+                encoding="UTF-8",
+            ) as f:
+                f.write(window["ML"].get())
     if event == sg.WIN_CLOSED or event == "Exit":
         break
 
