@@ -15,6 +15,7 @@ window = sg.Window("Judd Ofelt Solver in Python", layout, finalize=True)
 
 x = Multiplet()
 filename = ""
+params = None
 while True:
     event, values = window.read()
     # print(event, values)

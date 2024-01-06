@@ -11,21 +11,20 @@ qe = 4.8032068e-10
 
 class Line:
     def __init__(self, f, wn, u2, u4, u6):
-        if f is not None :
+        if f is not None:
             self.f = float(f)
         else:
-            self.f=None
+            self.f = None
         self.wn = float(wn)
         self.u2 = float(u2)
         self.u4 = float(u4)
         self.u6 = float(u6)
 
     def __str__(self):
-        stringrep=''
         if self.f is not None:
-            stringrep=f"{self.f:.5} {int(self.wn): 5d} {self.u2:.4} {self.u4:.4} {self.u6:.4}\n"
+            stringrep = f"{self.f:.5} {int(self.wn): 5d} {self.u2:.4} {self.u4:.4} {self.u6:.4}\n"
         else:
-            stringrep=f"{int(self.wn): 5d} {self.u2:.4} {self.u4:.4} {self.u6:.4}\n"
+            stringrep = f"{int(self.wn): 5d} {self.u2:.4} {self.u4:.4} {self.u6:.4}\n"
 
         return (
                 stringrep
@@ -68,7 +67,8 @@ class Multiplet:
         self.tjpo = np.longdouble(twojplusone)
         for i in range(1, len(lines)):
             pattern = re.compile(
-                "^(?P<f>[0-9.E+-]+) (?P<wn>[0-9.]+) (?P<u2>[0-9.]+) (?P<u4>[0-9.]+) (?P<u6>[0-9.]+) ?(?:#amd=(?P<amd>[0-9.]+))?",
+                "^(?P<f>[0-9.E+-]+) (?P<wn>[0-9.]+)" +
+                " (?P<u2>[0-9.]+) (?P<u4>[0-9.]+) (?P<u6>[0-9.]+) ?(?:#amd=(?P<amd>[0-9.]+))?",
                 re.I,
             )
             match = pattern.search(lines[i])
@@ -107,7 +107,7 @@ class Multiplet:
             if match.groupdict()["amd"] is not None:
                 self.amd = self.n**3 * np.longdouble(match.groupdict()["amd"])
                 # print(f'Magnetic dipole contribution to transition rate is {self.amd}')
-            self.add_line(Line(None,wn, u2, u4, u6))
+            self.add_line(Line(None, wn, u2, u4, u6))
         print(self)
 
     def calculate_rates(self, parameters):

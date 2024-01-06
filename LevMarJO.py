@@ -5,10 +5,10 @@ from Multiplet import oscillator_strength
 
 
 def chi2(multiplet, params):
-    chi2 = 0
+    chi2_value = 0
     for line in multiplet.lines:
-        chi2 += (residue(line, multiplet.n, multiplet.tjpo, params)) ** 2
-    return chi2
+        chi2_value += (residue(line, multiplet.n, multiplet.tjpo, params)) ** 2
+    return chi2_value
 
 
 def residue(line, n, tjpo, params):
@@ -26,7 +26,6 @@ def calculate_matrices(multiplet, params):
         for j in range(params.shape[0]):
             d_par = np.zeros(params.shape[0])
             d_par[j] = delta
-            # print(f"{(residue(multiplet.lines[i],multiplet.n,multiplet.tjpo,params + dPar))} , R[i]={R[i] } {params} {dPar}")
             jacobian[i, j] = np.longdouble(
                 (
                     residue(
@@ -44,6 +43,8 @@ def calculate_matrices(multiplet, params):
 
 def levenberg_marquardt_fit(dane):
     params = np.array([1e-20, 2e-20, 3e-20])
+    hessd = np.array([1, 1, 1])  # Initialization with bogus values just in case
+    curr_chi2 = 0
     lam = 1 / 1024.0
     print("Step number o2 o4 o6 chi2")
     for j in range(10):
@@ -75,7 +76,8 @@ def levenberg_marquardt_fit(dane):
     )
     print(f"Errors are dO2 {error[0]:.3} do4 {error[1]:.3} do6 {error[2]:.3}")
     print(
-        f"Relative errors are dO2/O2 {100*error[0]/params[0]:.3}% dO4/O4 {100*error[1]/params[1]:.3}% dO6/O6 {100*error[2]/params[2]:.3} %"
+        f"Relative errors are dO2/O2 {100*error[0]/params[0]:.3}%" +
+        f"dO4/O4 {100*error[1]/params[1]:.3}% dO6/O6 {100*error[2]/params[2]:.3} %"
     )
     print("______________________________________________")
     print("Wavenumber wavelength fexp fteor (fexp-fteor)/fexp [%]")
@@ -93,7 +95,8 @@ def levenberg_marquardt_fit(dane):
     size = len(dane.lines) - 3
     print("______________________________________________")
     print(
-        f"RMS error is {np.sqrt(sum_of_squares/size):.3} RMS/avg f {100*np.sqrt(sum_of_squares/size)/sum_of_strengths:.1f} %"
+        f"RMS error is {np.sqrt(sum_of_squares/size):.3}" +
+        f" RMS/avg f {100*np.sqrt(sum_of_squares/size)/sum_of_strengths:.1f} %"
     )
     dane.is_fitted = True
     print("______________________________________________")
