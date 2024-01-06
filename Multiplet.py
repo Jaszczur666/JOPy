@@ -11,15 +11,24 @@ qe = 4.8032068e-10
 
 class Line:
     def __init__(self, f, wn, u2, u4, u6):
-        self.f = float(f)
+        if f is not None :
+            self.f = float(f)
+        else:
+            self.f=None
         self.wn = float(wn)
         self.u2 = float(u2)
         self.u4 = float(u4)
         self.u6 = float(u6)
 
     def __str__(self):
+        stringrep=''
+        if self.f is not None:
+            stringrep=f"{self.f:.5} {int(self.wn): 5d} {self.u2:.4} {self.u4:.4} {self.u6:.4}\n"
+        else:
+            stringrep=f"{int(self.wn): 5d} {self.u2:.4} {self.u4:.4} {self.u6:.4}\n"
+
         return (
-            f"{self.f:.5} {int(self.wn): 5d} {self.u2:.4} {self.u4:.4} {self.u6:.4}\n"
+                stringrep
         )
 
 
@@ -98,7 +107,7 @@ class Multiplet:
             if match.groupdict()["amd"] is not None:
                 self.amd = self.n**3 * np.longdouble(match.groupdict()["amd"])
                 # print(f'Magnetic dipole contribution to transition rate is {self.amd}')
-            self.add_emline(EmLine(wn, u2, u4, u6))
+            self.add_line(Line(None,wn, u2, u4, u6))
         print(self)
 
     def calculate_rates(self, parameters):
